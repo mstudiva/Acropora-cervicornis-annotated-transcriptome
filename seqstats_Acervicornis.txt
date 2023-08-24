@@ -1,0 +1,13 @@
+
+Acervicornis.fasta
+-------------------------
+95389 sequences.
+642 average length.
+18378 maximum length.
+200 minimum length.
+N50 = 977
+61.2 Mb altogether (61198767 bp).
+0 ambiguous Mb. (0 bp, 0%)
+0 Mb of Ns. (0 bp, 0%)
+-------------------------
+
