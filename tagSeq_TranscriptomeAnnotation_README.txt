@@ -1,4 +1,4 @@
-# Acropora cervicornis Transcriptome Annotation, version August 22, 2023
+# Acropora cervicornis Transcriptome Annotation, version December 20, 2023
 # Created by Misha Matz (matz@utexas.edu), modified by Michael Studivan (studivanms@gmail.com) for use on FAU's HPC (KoKo)
 
 
@@ -47,12 +47,11 @@ cd annotate
 #------------------------------
 # getting transcriptomes
 
-# Libro (2013)
-https://doi.org/10.1371/journal.pone.0081821
+# Locatelli (unpublished)
+# scp from local machine
 
 # Renaming gene identifiers for ease
-sed -i 's/comp/Acropora/g' Acervicornis.fasta
-sed -i 's/isogroup/Acropora/g' Acervicornis.fasta
+sed -i 's/FUN_/Acervicornis/g' Acervicornis.fasta
 
 # transcriptome statistics
 conda activate bioperl
@@ -62,14 +61,14 @@ sbatch seq_stats.slurm
 
 Acervicornis.fasta
 -------------------------
-95389 sequences.
-642 average length.
-18378 maximum length.
-200 minimum length.
-N50 = 977
-61.2 Mb altogether (61198767 bp).
-0 ambiguous Mb. (0 bp, 0%)
-0 Mb of Ns. (0 bp, 0%)
+36455 sequences.
+1678 average length.
+65308 maximum length.
+61 minimum length.
+N50 = 2747
+61.2 Mb altogether (61163689 bp).
+0 ambiguous Mb. (100 bp, 0%)
+0 Mb of Ns. (100 bp, 0%)
 -------------------------
 
 
@@ -88,10 +87,10 @@ echo "makeblastdb -in uniprot_sprot.fasta -dbtype prot" >mdb
 launcher_creator.py -j mdb -n mdb -q shortq7 -t 6:00:00 -e studivanms@gmail.com
 sbatch mdb.slurm
 
-# splitting the transcriptome into 200 chunks, or however many is needed to keep the number of seqs per chunk under 1000
-splitFasta.pl Acervicornis.fasta 200
+# splitting the transcriptome into 50 chunks, or however many is needed to keep the number of seqs per chunk under 1000
+splitFasta.pl Acervicornis.fasta 50
 
-# blasting all 200 chunks to uniprot in parallel, 4 cores per chunk
+# blasting all 50 chunks to uniprot in parallel, 4 cores per chunk
 ls subset* | perl -pe 's/^(\S+)$/blastx -query $1 -db uniprot_sprot\.fasta -evalue 0\.0001 -num_threads 4 -num_descriptions 5 -num_alignments 5 -out $1.br/'>bl
 launcher_creator.py -j bl -n blast -t 6:00:00 -q shortq7 -e studivanms@gmail.com
 sbatch blast.slurm
@@ -105,8 +104,8 @@ cat subset*br > myblast.br
 rm subset*
 
 # for trinity-assembled transcriptomes: annotating with isogroups
-grep ">" Acervicornis.fasta | perl -pe 's/>Acropora(\d+)(\S+)\s.+/Acropora$1$2\tAcropora$1/'>Acervicornis_seq2iso.tab
-cat Acervicornis.fasta | perl -pe 's/>Acropora(\d+)(\S+).+/>Acropora$1$2 gene=Acropora$1/'>Acervicornis_iso.fasta
+grep ">" Acervicornis.fasta | perl -pe 's/>Acervicornis(\d+)(\S+)\s.+/Acervicornis$1$2\tAcervicornis$1/'>Acervicornis_seq2iso.tab
+cat Acervicornis.fasta | perl -pe 's/>Acervicornis(\d+)(\S+).+/>Acervicornis$1$2 gene=Acervicornis$1/'>Acervicornis_iso.fasta
 
 
 #-------------------------
@@ -130,10 +129,10 @@ cd /path/to/local/directory
 scp mstudiva@koko-login.hpc.fau.edu:~/path/to/HPC/directory/\*_out_PRO.fas .
 
 # copy link to job ID status and output file, paste it below instead of current link:
-# http://eggnog-mapper.embl.de/job_status?jobname=MM_tlipouzn
+# http://eggnog-mapper.embl.de/job_status?jobname=MM_f9vtfjaq
 
 # once it is done, download results to HPC:
-wget http://eggnog-mapper.embl.de/MM_tlipouzn/out.emapper.annotations
+wget http://eggnog-mapper.embl.de/MM_f9vtfjaq/out.emapper.annotations
 
 # GO:
 awk -F "\t" 'BEGIN {OFS="\t" }{print $1,$10 }' out.emapper.annotations | grep GO | perl -pe 's/,/;/g' >Acervicornis_iso2go.tab
@@ -165,10 +164,10 @@ cd /path/to/local/directory
 scp mstudiva@koko-login.hpc.fau.edu:~/path/to/HPC/directory/\*4kegg.fasta .
 # use web browser to submit 4kegg.fasta file to KEGG's KAAS server (http://www.genome.jp/kegg/kaas/)
 # select SBH method, upload nucleotide query
-https://www.genome.jp/kaas-bin/kaas_main?mode=user&id=1692906473&key=UeFpZxV6
+https://www.genome.jp/kaas-bin/kaas_main?mode=user&id=1703099308&key=XH4o3NDM
 
 # Once it is done, download to HPC - it is named query.ko by default
-wget https://www.genome.jp/tools/kaas/files/dl/1692906473/query.ko
+wget https://www.genome.jp/tools/kaas/files/dl/1703099308/query.ko
 
 # selecting only the lines with non-missing annotation:
 cat query.ko | awk '{if ($2!="") print }' > Acervicornis_iso2kegg.tab
