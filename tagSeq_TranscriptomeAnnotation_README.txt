@@ -47,7 +47,7 @@ cd annotate
 #------------------------------
 # getting transcriptomes
 
-# Locatelli (unpublished)
+# Locatelli et al. (2024): https://zenodo.org/doi/10.5281/zenodo.12021086
 # scp from local machine
 
 # Renaming gene identifiers for ease
